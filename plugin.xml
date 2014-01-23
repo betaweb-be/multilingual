@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<zend-config xmlns:zf="http://framework.zend.com/xml/zend-config-xml/1.0/">
+		<plugin>
+			<pluginName>SEInternationalisation</pluginName>
+			<pluginDescription>Studio Emma Internationalisation plugin</pluginDescription>
+            <pluginNiceName>SEInternationalisation Plugin</pluginNiceName>
+			<pluginClassName>SEInternationalisation_Plugin</pluginClassName>
+			<!-- include paths relative to plugin-directory -->
+			<pluginIncludePaths>
+				<path>/SEInternationalisation/lib/SEInternationalisation</path>
+				<path>/SEInternationalisation/lib/</path>
+				<path>/SEInternationalisation/controllers</path>
+				<path>/SEInternationalisation/models</path>
+			</pluginIncludePaths>
+			<!-- namespaces to register with autoloader-->
+			<pluginNamespaces>
+                <namespace>SEInternationalisation</namespace>
+			</pluginNamespaces>
+			<!-- js files with path relative to plugin-directory -->
+			<pluginJsPaths>
+				<path>/SEInternationalisation/static/js/document/tree.js</path>
+				<path>/SEInternationalisation/static/js/SEInternationalisation.js</path>
+			</pluginJsPaths>
+			<!-- css files with path relative to plugin-directory -->
+			<pluginCssPaths>
+				<path>/SEInternationalisation/static/css/style.css</path>
+			</pluginCssPaths>
+		</plugin>
+</zend-config>
