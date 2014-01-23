@@ -15,7 +15,7 @@ class SEInternationalisation_Document {
 		if (!empty($row)) {
 			return $row->document_id;
 		} else {
-			die(print_r(debug_backtrace()));
+//			die(print_r(debug_backtrace()));
 			throw new Exception("Document (".$document_id.") not available in ".$language);
 		}
 	}

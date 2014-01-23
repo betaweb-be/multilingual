@@ -51,29 +51,61 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 			// Create folders for each Language
 			$languages = (array)Pimcore_Tool::getValidLanguages();
 
-			if ($languages) {
-				$primaryLanguage = $languages[0];
-				$sourcePath = '/' . $primaryLanguage;
-				foreach ($languages as $language) {
-					$folder = Document_Folder::getByPath('/' . $language);
-					if (!$folder) {
-						$folder = Document_Folder::create(1, array(
-							'key' => $language,
-							"userOwner" => 1,
-							"userModification" => 1,
-							"published" => true,
-						));
-					}
-					// Also set the language property for the document
-					$folder->setProperty('language', 'text', $language);
-					$folder->save();
+			// Get list of sites
+			$siteList = new Site_List();
+			$sites = $siteList->load();
 
-					// Create enty in plugin table, so basic link is provided
-					$sql = "INSERT INTO se_i18n_keys(document_id,language,sourcePath) VALUES(
+			if ($languages && count($languages) >= 1) {
+				$primaryLanguage = $languages[0];
+				foreach ($languages as $language) {
+					$rootIds = array();
+
+					if ($sites) {
+						// Multisite website, add language folders for all subsites
+						/**
+						 * @var $site Site
+						 */
+						foreach ($sites as $site) {
+							$rootIds[] = $site->getRootId();
+						}
+					} else {
+						// No sites; just use the primary root
+						$rootIds[] = 1;
+					}
+
+					foreach ($rootIds as $rootId) {
+						$rootDocument = Document::getById($rootId);
+						if ($rootDocument->getKey() ==  '') {
+							$sourcePath = $rootDocument->getRealFullPath() . $primaryLanguage;
+						} else {
+							$sourcePath = $rootDocument->getRealFullPath() . '/' . $primaryLanguage;
+						}
+
+						if ($rootDocument->getKey() ==  '') {
+							$rootPath = $rootDocument->getRealFullPath() . $language;
+						} else {
+							$rootPath = $rootDocument->getRealFullPath() . '/' . $language;
+						}
+						$folder = Document_Folder::getByPath($rootPath);
+						if (!$folder) {
+							$folder = Document_Folder::create($rootId, array(
+								'key' => $language,
+								"userOwner" => 1,
+								"userModification" => 1,
+								"published" => true,
+							));
+						}
+						// Also set the language property for the document
+						$folder->setProperty('language', 'text', $language);
+						$folder->save();
+
+						// Create enty in plugin table, so basic link is provided
+						$sql = "INSERT INTO se_i18n_keys(document_id,language,sourcePath) VALUES(
 					'" . $folder->getId() . "',
 					'" . $language . "',
 					'" . $sourcePath . "')";
-					Pimcore_API_Plugin_Abstract::getDb()->query($sql);
+						Pimcore_API_Plugin_Abstract::getDb()->query($sql);
+					}
 				}
 			}
 		} catch (Exception $e) {

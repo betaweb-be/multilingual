@@ -345,6 +345,29 @@ pimcore.document.tree = Class.create({
         window.close();
     },
 
+    editDocuments: function(button, event) {
+        var el = Ext.getCmp('form_add_document');
+        var form = el.getForm();
+        var data = {};
+        data['language'] = this.attributes.reference.getSelectedLanguage();
+        data['id'] = this.id;
+        form.items.each(function(e) {
+            data[e.getId()] = pimcore.helpers.getValidFilename(e.getValue());
+        });
+        this.getOwnerTree().loadMask.show();
+
+        // Perform ajax request to add documents
+        Ext.Ajax.request({
+            url: "/plugin/SEInternationalisation/document/update",
+            params: data,
+            success: this.attributes.reference.editDocumentKeyComplete.bind(this)
+        });
+
+        // Close window
+        var window = Ext.getCmp('window_add_document');
+        window.close();
+    },
+
     getTreeNodeListeners: function () {
         var treeNodeListeners = {
             'click' : this.onTreeNodeClick,
@@ -647,13 +670,13 @@ pimcore.document.tree = Class.create({
 //            }));
 //        }
 //
-//        if (this.attributes.permissions.rename && this.id != 1 && !this.attributes.locked) {
-//            menu.add(new Ext.menu.Item({
-//                text: t('rename'),
-//                iconCls: "pimcore_icon_edit_key",
-//                handler: this.attributes.reference.editDocumentKey.bind(this)
-//            }));
-//        }
+        if (this.attributes.permissions.rename && this.id != 1 && !this.attributes.locked) {
+            menu.add(new Ext.menu.Item({
+                text: t('rename'),
+                iconCls: "pimcore_icon_edit_key",
+                handler: this.attributes.reference.editDocumentKey.bind(this)
+            }));
+        }
 
 //        // not for the home document
 //        if(this.id != 1 && this.attributes.permissions.publish && !this.attributes.locked) {
@@ -1220,8 +1243,9 @@ pimcore.document.tree = Class.create({
     },
 
     editDocumentKey : function () {
-        Ext.MessageBox.prompt(t('edit_key'), t('please_enter_the_new_key'),
-            this.attributes.reference.editDocumentKeyComplete.bind(this), null, null, this.text);
+        this.attributes.reference.showEditDocumentDialog(this, t('edit_key'), t('please_enter_the_new_key'), this.id, this.attributes.reference.editDocuments.bind(this));
+//        Ext.MessageBox.prompt(t('edit_key'), t('please_enter_the_new_key'),
+//            this.attributes.reference.editDocumentKeyComplete.bind(this), null, null, this.text);
     },
 
     editDocumentKeyComplete: function (button, value, object) {

@@ -111,27 +111,27 @@ class SEInternationalisation_DocumentController extends Admin_DocumentController
 			$offset = intval($this->_getParam("start"));
 	
 	
-			$allowedIds = array();
-			if ($node == 1 && !is_null($language)) {
-				$t = new SEInternationalisation_Table_Properties();
-				$select = $t->select()->where("name = 'language'")->where("type = 'text'")->where("data = ?", $language);
-				$rows = $t->fetchAll($select);
-				foreach ($rows as $row) {
-					$allowedIds[] = (int)$row->cid;
-				}
-			}
+//			$allowedIds = array();
+//			if ($node == 1 && !is_null($language)) {
+//				$t = new SEInternationalisation_Table_Properties();
+//				$select = $t->select()->where("name = 'language'")->where("type = 'text'")->where("data = ?", $language);
+//				$rows = $t->fetchAll($select);
+//				foreach ($rows as $row) {
+//					$allowedIds[] = (int)$row->cid;
+//				}
+//			}
 			$list = new Document_List();
-			if (!empty($allowedIds) && $node == 1) {
-				$list->setCondition("parentId = ".(int)$document->getId()." AND id IN (?)", implode(",", $allowedIds));
-			} else {
+//			if (!empty($allowedIds) && $node == 1) {
+//				$list->setCondition("parentId = ".(int)$document->getId()." AND id IN (?)", implode(",", $allowedIds));
+//			} else {
 				$list->setCondition("parentId = ?", (int)$document->getId());				
-			}
+//			}
 			$list->setOrderKey("index");
 			$list->setOrder("asc");
 			$list->setLimit($limit);
 			$list->setOffset($offset);
 			$childsList = $list->load();
-	
+
 			foreach ($childsList as $childDocument) {
 				// get current user permissions
 //				$childDocument->getPermissionsForUser($this->getUser());
@@ -141,7 +141,14 @@ class SEInternationalisation_DocumentController extends Admin_DocumentController
 					if ($node == 1) {
 						$config["expanded"] = true;
 					}
-					$documents[] = $config;
+
+					if ($childDocument instanceof Document_Folder && strlen($childDocument->getKey()) == 2) {
+						if ($childDocument->getKey() == $language) {
+							$documents[] = $config;
+						}
+					} else {
+						$documents[] = $config;
+					}
 				}
 				 
 			}
