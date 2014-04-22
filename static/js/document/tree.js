@@ -714,7 +714,7 @@ pimcore.document.tree = Class.create({
 //        }
 
         //publish
-        if (this.attributes.permissions.publish && this.attributes.type != "folder" && !this.attributes.locked && this.parentNode.id != 1) {
+        if (this.attributes.permissions.publish && this.attributes.type != "folder" && !this.attributes.locked && this.id != 1) {
             if (this.attributes.published) {
                 var unpublishMenu = [];
                 unpublishMenu.push({
@@ -770,37 +770,37 @@ pimcore.document.tree = Class.create({
         // site-mgnt
         var user = pimcore.globalmanager.get("user");
 
-//        if (user.admin && this.attributes.type == "page" && this.id != 1) {
-//            if (!this.attributes.site) {
-//                menu.add(new Ext.menu.Item({
-//                    text: t('advanced'),
-//                    iconCls: "",
-//                    hideOnClick: false,
-//                    menu: [
-//                        {
-//                            text: t('use_as_site'),
-//                            handler: this.attributes.reference.addUpdateSite.bind(this)
-//                        }
-//                    ]
-//                }));
-//            }
-//            else {
-//                menu.add(new Ext.menu.Item({
-//                    text: t('advanced'),
-//                    iconCls: "",
-//                    hideOnClick: false,
-//                    menu: [
-//                        {
-//                            text: t('edit_site'),
-//                            handler: this.attributes.reference.addUpdateSite.bind(this)
-//                        }, {
-//                            text: t('remove_site'),
-//                            handler: this.attributes.reference.removeSite.bind(this)
-//                        }
-//                    ]
-//                }));
-//            }
-//        }
+        if (user.admin && this.attributes.type == "page" && this.id != 1) {
+            if (!this.attributes.site) {
+                menu.add(new Ext.menu.Item({
+                    text: t('advanced'),
+                    iconCls: "",
+                    hideOnClick: false,
+                    menu: [
+                        {
+                            text: t('use_as_site'),
+                            handler: this.attributes.reference.addUpdateSite.bind(this)
+                        }
+                    ]
+                }));
+            }
+            else {
+                menu.add(new Ext.menu.Item({
+                    text: t('advanced'),
+                    iconCls: "",
+                    hideOnClick: false,
+                    menu: [
+                        {
+                            text: t('edit_site'),
+                            handler: this.attributes.reference.addUpdateSite.bind(this)
+                        }, {
+                            text: t('remove_site'),
+                            handler: this.attributes.reference.removeSite.bind(this)
+                        }
+                    ]
+                }));
+            }
+        }
 
 //        if (this.id != 1) {
 //            if(user.admin) { // only admins are allowed to change locks in frontend
