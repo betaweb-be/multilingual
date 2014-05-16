@@ -20,20 +20,25 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 	}
 
 	/**
+	 * Event that handles the creation of a document
+	 *
 	 * @param $e
 	 * @throws Exception
 	 * @throws Zend_Exception
 	 */
 	public function createDocument($e)
 	{
+
+		// Check if this function is not in progress
 		if (Zend_Registry::isRegistered('SEI18N_add') && Zend_Registry::get('SEI18N_add') == 1) {
 			return;
 		}
+		// Lock this event-trigger
+		Zend_Registry::set('SEI18N_add', 1);
 
 		/**@var Document $doc */
 		$doc = $e->getTarget();
 
-		Zend_Registry::set('SEI18N_add', 1);
 
 		// Get current language
 		$sourceLanguage = $doc->getProperty('language');
@@ -55,58 +60,72 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 		$languages = (array)Pimcore_Tool::getValidLanguages();
 		foreach ($languages as $language) {
 			if ($language != $sourceLanguage) {
-				$targetParent = Document::getById(
-					SEInternationalisation_Document::getDocumentIdInOtherLanguage($sourceParent->getId(), $language)
-				);
-				/** @var Document_Page $target */
-				$target = clone $doc;
-				$target->id = null;
-				$target->setParent($targetParent);
-				$editableDocumentTypes = array('page', 'email', 'snippet');
-				if (in_array($doc->getType(), $editableDocumentTypes)) {
-					$target->setContentMasterDocument($doc);
-				}
-				$target->save();
+				$targetParent = SEInternationalisation_Document::getDocumentInOtherLanguage($sourceParent, $language);
+				if ($targetParent) {
+					/** @var Document_Page $target */
+					$target = clone $doc;
 
-				// Add Link to other languages
-				$t = new SEInternationalisation_Table_Keys();
-				$t->insert(
-					array(
-						"document_id" => $target->getId(),
-						"language" => $language,
-						"sourcePath" => $sourceHash,
-					)
-				);
+					// Reset ID (so it will create a new document)
+					$target->id = null;
+
+					// Set new parent
+					$target->setParent($targetParent);
+
+					// Check if we can link a master document
+					$editableDocumentTypes = array('page', 'email', 'snippet');
+					if (in_array($doc->getType(), $editableDocumentTypes)) {
+						$target->setContentMasterDocument($doc);
+					}
+
+					// Save the new document
+					$target->save();
+
+					// Add Link to other languages
+					$t = new SEInternationalisation_Table_Keys();
+					$t->insert(
+						array(
+							"document_id" => $target->getId(),
+							"language" => $language,
+							"sourcePath" => $sourceHash,
+						)
+					);
+				}
 			}
 		}
 
+		// Unlock this event-trigger
 		Zend_Registry::set('SEI18N_add', 0);
 	}
 
 	/**
+	 * Event after deleting a document
+	 *
+	 * Deletes all related documents
+	 *
 	 * @param $e
 	 * @throws Exception
 	 * @throws Zend_Exception
 	 */
 	public function deleteDocument($e)
 	{
+		// Check if this function is not in progress
 		if (Zend_Registry::isRegistered('SEI18N_delete') && Zend_Registry::get('SEI18N_delete') == 1) {
 			return;
 		}
-
-		/**@var Document $doc */
-		$doc = $e->getTarget();
-
+		// Lock this event-trigger
 		Zend_Registry::set('SEI18N_delete', 1);
 
-		// Get current language
-		$sourceLanguage = $doc->getProperty('language');
+		/**@var Document $sourceDocument */
+		$sourceDocument = $e->getTarget();
 
-		// Create folders for each Language
+		// Get current language
+		$sourceLanguage = $sourceDocument->getProperty('language');
+
+		// Remove document in each language
 		$languages = (array)Pimcore_Tool::getValidLanguages();
 		foreach ($languages as $language) {
 			if ($language != $sourceLanguage) {
-				$target = SEInternationalisation_Document::getDocumentInOtherLanguage($doc, $language);
+				$target = SEInternationalisation_Document::getDocumentInOtherLanguage($sourceDocument, $language);
 				if ($target) {
 					$target->delete();
 				}
@@ -115,19 +134,23 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 
 		// Remove link to other documents
 		$t = new SEInternationalisation_Table_Keys();
-		$row = $t->fetchRow('document_id = ' . $doc->getId());
+		$row = $t->fetchRow('document_id = ' . $sourceDocument->getId());
 		$t->delete('sourcePath = "' . $row->sourcePath . '"');
 
+		// Unlock this event-trigger
 		Zend_Registry::set('SEI18N_delete', 0);
 	}
 
 	/**
+	 * Event that handles the update of a Document
+	 *
 	 * @param $e
 	 * @throws Exception
 	 * @throws Zend_Exception
 	 */
 	public function updateDocument($e)
 	{
+		// Check if this function is not in progress
 		if (Zend_Registry::isRegistered('SEI18N_' . __FUNCTION__) && Zend_Registry::get(
 				'SEI18N_' . __FUNCTION__
 			) == 1
@@ -135,13 +158,16 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 			return;
 		}
 
+		// Lock this event-trigger
+		Zend_Registry::set('SEI18N_' . __FUNCTION__, 1);
+
 		/**@var Document_Page $sourceDocument */
 		$sourceDocument = $e->getTarget();
 
-		Zend_Registry::set('SEI18N_' . __FUNCTION__, 1);
-
 		// Get current language
 		$sourceLanguage = $sourceDocument->getProperty('language');
+
+		// Get the Source Parent (we have to do it this way, due to a bug in Pimcore)
 		$sourceParent = Document::getById($sourceDocument->getParentId());
 
 		// Update SourcePath in SEI18N table
@@ -149,7 +175,7 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 		$row = $t->fetchRow('document_id = ' . $sourceDocument->getId());
 		$t->update(array('sourcePath' => $sourceDocument->getFullPath()), 'sourcePath = "' . $row->sourcePath . '"');
 
-		// Create folders for each Language
+		// Update each language
 		$languages = (array)Pimcore_Tool::getValidLanguages();
 		foreach ($languages as $language) {
 			if ($language != $sourceLanguage) {
@@ -204,12 +230,13 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 						// Set the controller the same
 						$editableDocumentTypes = array('page', 'email', 'snippet');
 						if (!$typeHasChanged && in_array($sourceDocument->getType(), $editableDocumentTypes)) {
-							/** @var Document_Page $target */
+							/** @var Document_Page $targetDocument */
 							$targetDocument->setController($sourceDocument->getController());
 							$targetDocument->setAction($sourceDocument->getAction());
 						}
 
 						// Set the properties the same
+						// But only if they have not been added already
 						$sourceProperties = $sourceDocument->getProperties();
 						/** @var string $key
 						 * @var Property $value
@@ -271,6 +298,7 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 			}
 		}
 
+		// Unlock this event-trigger
 		Zend_Registry::set('SEI18N_' . __FUNCTION__, 0);
 	}
 
@@ -378,7 +406,7 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 						}
 						// Also set the language property for the document
 						$folder->setProperty('language', 'text', $language);
-						$folder->setProperty('isLanguageRoot', 'text', 1,false,false);
+						$folder->setProperty('isLanguageRoot', 'text', 1, false, false);
 						$folder->save();
 
 						// Create enty in plugin table, so basic link is provided
