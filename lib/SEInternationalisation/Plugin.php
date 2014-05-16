@@ -147,7 +147,7 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 		// Update SourcePath in SEI18N table
 		$t = new SEInternationalisation_Table_Keys();
 		$row = $t->fetchRow('document_id = ' . $sourceDocument->getId());
-		$t->update(array('sourcePath'=>$sourceDocument->getFullPath()),'sourcePath = "' . $row->sourcePath . '"');
+		$t->update(array('sourcePath' => $sourceDocument->getFullPath()), 'sourcePath = "' . $row->sourcePath . '"');
 
 		// Create folders for each Language
 		$languages = (array)Pimcore_Tool::getValidLanguages();
@@ -179,9 +179,20 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 							$typeHasChanged = true;
 							$targetDocument->setType($sourceDocument->getType());
 
-							if($targetDocument->getType() == "hardlink" || $targetDocument->getType() == "folder") {
+							if ($targetDocument->getType() == "hardlink" || $targetDocument->getType() == "folder") {
 								// remove navigation settings
-								foreach (["name", "title", "target", "exclude", "class", "anchor", "parameters", "relation", "accesskey", "tabindex"] as $propertyName) {
+								foreach ([
+											 "name",
+											 "title",
+											 "target",
+											 "exclude",
+											 "class",
+											 "anchor",
+											 "parameters",
+											 "relation",
+											 "accesskey",
+											 "tabindex"
+										 ] as $propertyName) {
 									$targetDocument->removeProperty("navigation_" . $propertyName);
 								}
 							}
@@ -367,6 +378,7 @@ class SEInternationalisation_Plugin extends Pimcore_API_Plugin_Abstract implemen
 						}
 						// Also set the language property for the document
 						$folder->setProperty('language', 'text', $language);
+						$folder->setProperty('isLanguageRoot', 'text', 1,false,false);
 						$folder->save();
 
 						// Create enty in plugin table, so basic link is provided
