@@ -23,6 +23,8 @@
 			<!-- js files with path relative to plugin-directory -->
 			<pluginJsPaths>
 				<path>/SEInternationalisation/static/js/SEInternationalisation.js</path>
+				<!--ENABLE THIS WHEN WORKING WITH SUBSITES-->
+				<!--<path>/SEInternationalisation/static/js/settings/website.js</path>-->
 			</pluginJsPaths>
 			<!-- css files with path relative to plugin-directory -->
 			<pluginCssPaths>
