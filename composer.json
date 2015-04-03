@@ -1,0 +1,16 @@
+{
+    "name": "studioemma/plugin-internationalisation",
+    "authors": [
+        {
+            "name": "Pieter Meyvaert",
+            "email": "pieter.meyvaert@studioemma.com"
+        },
+        {
+            "name": "Thomas Crepain",
+            "email": "thomas.crepain@studioemma.com"
+        }
+    ],
+    "version": "2.0.0",
+    "minimum-stability": "dev",
+    "require": {}
+}
