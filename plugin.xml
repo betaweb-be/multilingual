@@ -1,33 +1,30 @@
 <?xml version="1.0"?>
-<zend-config xmlns:zf="http://framework.zend.com/xml/zend-config-xml/1.0/">
-		<plugin>
-			<pluginName>SEInternationalisation</pluginName>
-			<pluginDescription>Studio Emma Internationalisation plugin</pluginDescription>
-
-			<pluginVersion>2.0</pluginVersion>
-			<pluginRevision>2000</pluginRevision>
-
-            <pluginNiceName>SEInternationalisation Plugin</pluginNiceName>
-			<pluginClassName>SEInternationalisation_Plugin</pluginClassName>
-			<!-- include paths relative to plugin-directory -->
-			<pluginIncludePaths>
-				<path>/SEInternationalisation/lib/SEInternationalisation</path>
-				<path>/SEInternationalisation/lib/</path>
-				<path>/SEInternationalisation/controllers</path>
-				<path>/SEInternationalisation/models</path>
-			</pluginIncludePaths>
-			<!-- namespaces to register with autoloader-->
-			<pluginNamespaces>
-                <namespace>SEInternationalisation</namespace>
-			</pluginNamespaces>
-			<!-- js files with path relative to plugin-directory -->
-			<pluginJsPaths>
-				<path>/SEInternationalisation/static/js/SEInternationalisation.js</path>
-				<!--ENABLE THIS WHEN WORKING WITH SUBSITES-->
-				<!--<path>/SEInternationalisation/static/js/settings/website.js</path>-->
-			</pluginJsPaths>
-			<!-- css files with path relative to plugin-directory -->
-			<pluginCssPaths>
-			</pluginCssPaths>
-		</plugin>
+<zend-config>
+    <plugin>
+        <!-- unique identifier = folder name -->
+        <pluginName>Multilingual</pluginName>
+        <pluginNiceName>Multilingual Support</pluginNiceName>
+        <pluginDescription>
+            Enable Multilingual document support for Pimcore.
+        </pluginDescription>
+        <!-- Version, revision and timestamp are updated by createRevision script at check in to plugin server!-->
+        <pluginVersion>3.0.0</pluginVersion>
+        <!-- className of the plugin which extends Pimcore_API_Plugin_Abstract-->
+        <pluginClassName>Multilingual\Plugin</pluginClassName>
+        <!-- include paths relative to plugin-directory -->
+        <pluginIncludePaths>
+            <path>/Multilingual/lib</path>
+            <path>/Multilingual/models</path>
+        </pluginIncludePaths>
+        <!-- namespaces to register with autoloader-->
+        <pluginNamespaces>
+            <namespace>Multilingual</namespace>
+        </pluginNamespaces>
+        <!-- js files needed for pimcore plugin (backend) with path relative to plugin-directory -->
+        <pluginJsPaths>
+            <path>/Multilingual/static/js/startup.js</path>
+        </pluginJsPaths>
+        <!-- path to a configuration file which is directly opened in the file explorer when you click on the configure button in the extension manager -->
+        <pluginXmlEditorFile>/website/var/plugins/Multilingual/config.xml</pluginXmlEditorFile>
+    </plugin>
 </zend-config>
