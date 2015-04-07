@@ -38,6 +38,8 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
     {
 
         self::createTables();
+        self::setup();
+
 
         if (self::isInstalled()) {
             return "Plugin successfully installed.";
@@ -116,6 +118,7 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
                                     "userOwner" => 1,
                                     "userModification" => 1,
                                     "published" => true,
+                                    "module" => "Multilingual",
                                     "controller" => 'default',
                                     "action" => 'go-to-first-child'
                                 )
@@ -158,6 +161,29 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
         }
 
         return $result;
+    }
+
+    public static function setup()
+    {
+        // Reset first page
+        $document = Document\Page::getById(1);
+        $document->setModule("Multilingual");
+        $document->setController("default");
+        $document->setAction('language-detection');
+        $document->save();
+
+        // Add predefined property
+        $property = Property\Predefined::create();
+        $property->setValues(array(
+            'key' => 'doNotSyncProperties',
+            'name' => 'Multilingual: Do not sync properties',
+            'description' => 'Do not sync properties across documents in other languages',
+            'data' => 1,
+            'type' => 'bool',
+            'ctype' => 'document',
+            'inheritable' => false
+        ));
+        $property->save();
     }
 
     /**
@@ -213,7 +239,7 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
         \Pimcore::getEventManager()->attach("document.postAdd", array($this, "createDocument"));
         \Pimcore::getEventManager()->attach("document.postDelete", array($this, "deleteDocument"));
         \Pimcore::getEventManager()->attach("document.postUpdate", array($this, "updateDocument"));
-        \Pimcore::getEventManager()->attach("admin.object.treeGetChildsById.preSendData", function($e) {
+        \Pimcore::getEventManager()->attach("admin.object.treeGetChildsById.preSendData", function ($e) {
             echo "<pre>";
             print_r($e);
             exit;

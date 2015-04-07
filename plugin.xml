@@ -24,6 +24,9 @@
         <pluginJsPaths>
             <path>/Multilingual/static/js/startup.js</path>
         </pluginJsPaths>
+        <pluginCssPaths>
+            <path>/Multilingual/static/css/cms.css</path>
+        </pluginCssPaths>
         <!-- path to a configuration file which is directly opened in the file explorer when you click on the configure button in the extension manager -->
         <pluginXmlEditorFile>/website/var/plugins/Multilingual/config.xml</pluginXmlEditorFile>
     </plugin>

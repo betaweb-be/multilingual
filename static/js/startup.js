@@ -30,8 +30,8 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
         // Loop through the store
         for (var i = 0; i < pimcore.settings.websiteLanguages.length; i++) {
             // Get vars
-            var lang = pimcore.settings.websiteLanguages[i]; //item.data['language'];
-            var id = pimcore.settings.websiteLanguages[i]; //item.data['id'];
+            var lang = pimcore.available_languages[pimcore.settings.websiteLanguages[i]];
+            var id = pimcore.settings.websiteLanguages[i];
 
             // Create language option in selectbox
             html += '<option value="' + id + '">' + lang + '</option>';
@@ -48,15 +48,20 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
 
         // Load the requested language on the change event of our selectbox
         var me = this;
-        Ext.get('documentLanguage').on('change', function () {
+        var documentLanguageElement = Ext.get('documentLanguage');
+        documentLanguageElement.on('change', function () {
             me.loadLanguage();
+            documentLanguageElement.dom.setAttribute("class", "");
+            documentLanguageElement.addClass("pimcore_icon_language_" + me.getSelectedLanguage().toLowerCase());
         });
 
         // Make sure the accordion doesn't collapse on click
-        Ext.get('documentLanguage').on('click', function () {
+        documentLanguageElement.on('click', function () {
             el.collapse();
         });
 
+        documentLanguageElement.dom.setAttribute("class", "");
+        documentLanguageElement.addClass("pimcore_icon_language_" + this.getSelectedLanguage().toLowerCase());
     },
 
     loadLanguage: function () {
