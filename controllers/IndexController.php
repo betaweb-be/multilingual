@@ -59,7 +59,10 @@ class Multilingual_IndexController extends Admin_DocumentController
                         $childDocument->getProperty('isLanguageRoot') == 1
                     ) {
                         if ($childDocument->getKey() == $language) {
-                            $documents[] = $this->getTreeNodeConfig($childDocument);
+//                            $documents[] = $this->getTreeNodeConfig($childDocument);
+                            $config = $this->getTreeNodeConfig($childDocument);
+                            $config['expanded'] = true;
+                            $documents[] = $config;
                         }
                     } else {
                         $documents[] = $this->getTreeNodeConfig($childDocument);

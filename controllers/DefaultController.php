@@ -1,13 +1,12 @@
 <?php
 
-use Pimcore\Controller\Action\Admin;
 use Pimcore\Model\Document;
 use Pimcore\Tool;
 
 /**
  * Class Multilingual_DefaultController
  */
-class Multilingual_DefaultController extends Admin
+class Multilingual_DefaultController extends \Website\Controller\Action
 {
     /**
      * @throws Exception

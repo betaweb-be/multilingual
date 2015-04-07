@@ -130,7 +130,7 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
                         $folder->save();
 
                         // Create enty in plugin table, so basic link is provided
-                        $sql = "INSERT INTO " . self::$_tableName . "(document_id,LANGUAGE,sourcePath) VALUES(
+                        $sql = "INSERT INTO " . self::$_tableName . "(document_id,language,sourcePath) VALUES(
 					'" . $folder->getId() . "',
 					'" . $language . "',
 					'" . $sourcePath . "')";
@@ -408,10 +408,15 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
                 );
                 if ($targetDocument) {
                     // Find the parent
-                    $targetParent = \Multilingual\Document::getDocumentInOtherLanguage(
-                        $sourceParent,
-                        $language
-                    );
+                    // If the parent is the root, document, no need to do a lookup
+                    if ($sourceParent->getId() == 1) {
+                        $targetParent = $sourceParent;
+                    } else {
+                        $targetParent = \Multilingual\Document::getDocumentInOtherLanguage(
+                            $sourceParent,
+                            $language
+                        );
+                    }
 
                     // Only sync properties when it is allowed
                     if (!$targetDocument->hasProperty('doNotSyncProperties') && !$sourceDocument->hasProperty(
