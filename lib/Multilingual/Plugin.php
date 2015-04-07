@@ -239,11 +239,6 @@ class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterfa
         \Pimcore::getEventManager()->attach("document.postAdd", array($this, "createDocument"));
         \Pimcore::getEventManager()->attach("document.postDelete", array($this, "deleteDocument"));
         \Pimcore::getEventManager()->attach("document.postUpdate", array($this, "updateDocument"));
-        \Pimcore::getEventManager()->attach("admin.object.treeGetChildsById.preSendData", function ($e) {
-            echo "<pre>";
-            print_r($e);
-            exit;
-        });
     }
 
     /**

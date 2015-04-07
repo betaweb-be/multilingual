@@ -29,9 +29,8 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
 
         // Loop through the store
         for (var i = 0; i < pimcore.settings.websiteLanguages.length; i++) {
-            // Get vars
-            var lang = pimcore.available_languages[pimcore.settings.websiteLanguages[i]];
             var id = pimcore.settings.websiteLanguages[i];
+            var lang = pimcore.available_languages[id];
 
             // Create language option in selectbox
             html += '<option value="' + id + '">' + lang + '</option>';
@@ -71,7 +70,6 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
             document.getElementById('documentLanguage').disabled = false;
             pimcore.globalmanager.get("layout_document_tree").tree.root.expand();
         });
-
     },
 
     loadLanguageInitial: function () {
@@ -82,7 +80,6 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
             pimcore.globalmanager.get("layout_document_tree").tree.getLoader().load(pimcore.globalmanager.get("layout_document_tree").tree.root);
             pimcore.globalmanager.get("layout_document_tree").tree.root.expand();
         });
-
     },
 
     getSelectedLanguage: function () {
