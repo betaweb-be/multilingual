@@ -1,5 +1,6 @@
 {
-  "name": "studioemma/plugin-multilingual",
+  "name": "studioemma/multilingual",
+  "type": "pimcore-plugin",
   "authors": [
     {
       "name": "Pieter Meyvaert",
@@ -13,4 +14,7 @@
   "version": "3.0.0",
   "minimum-stability": "dev",
   "require": {}
+  "require": {
+    "pimcore/installer-plugin": "~1.3"
+  }
 }
