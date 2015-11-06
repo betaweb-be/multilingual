@@ -1,7 +1,7 @@
 # Multilingual Plugin
 
 Adds feature to Pimcore documents to create a solid tree throughout different languages.
-Every document will exists in all languages.
+Every language will have the exact same document tree. No exceptions.
 
 ## Features
 
