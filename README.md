@@ -22,5 +22,11 @@ Every language will have the exact same document tree. No exceptions.
 $this->inotherlang($document, $language = null);
 
 Returns the provided document in the provided language.
+
 If no language is provided, the current active language is used.
+
 A Document object or document ID is accepted.
+
+## Licence
+
+[OSL - Open Software Licence 3.0](http://opensource.org/licenses/osl-3.0.php)
