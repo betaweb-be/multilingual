@@ -1,5 +1,6 @@
 {
   "name": "studioemma/multilingual",
+  "description": "Enable Multilingual document support for Pimcore.",
   "type": "pimcore-plugin",
   "authors": [
     {
