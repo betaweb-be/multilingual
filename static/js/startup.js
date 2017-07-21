@@ -9,18 +9,34 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
     },
 
     pimcoreReady: function () {
+        // Set the document retrieval url to the plugin
+        var dataUrl = '/plugin/Multilingual/index/tree-get-childs-by-id/';
+        pimcore.globalmanager.get("layout_document_tree").treeDataUrl = dataUrl;
+        pimcore.globalmanager.get("layout_document_tree").tree.getStore().proxy.url = dataUrl;
+
+        /*
+         * because the initial load of the tree can't be skipped and ajax is async, we can't make
+         * sure that our call ends sooner than the initial call. This can result in all languages
+         * being loaded into the tree instead of only the selected one.
+         * We listen for the load event (= tree was fully loaded) and if the url didn't match our
+         * plugin's url we load our language.
+         * This is kinda hackish but looks to be working as it should
+         */
+        var self = this;
+        pimcore.globalmanager.get("layout_document_tree").tree.getStore().on('load', function() {
+            var loadedUrl = arguments[3].getRequest().getUrl();
+            if (typeof loadedUrl === 'string' && loadedUrl.substring(0, dataUrl.length) !== dataUrl) {
+                self.loadLanguageInitial();
+            }
+        });
+
+
         // Set the language selector in the documents header
         this.setHeader();
-
-        // Set the document retrieval url to the plugin
-        pimcore.globalmanager.get("layout_document_tree").treeDataUrl = '/plugin/Multilingual/index/tree-get-childs-by-id/';
-
-        // Load initial language selection
-        this.loadLanguageInitial();
     },
 
     postOpenDocument: function (document, type) {
-        document.properties.languagesPanel.form.items.items[0].disabled = true;		// disable language property
+        document.properties.languagesPanel.items.items[0].disabled = true;		// disable language property
     },
 
     setHeader: function () {
@@ -45,46 +61,63 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
         // Set title
         el.setTitle(el.title + ' ' + html);
 
+        // set the default value
+        document.getElementById('documentLanguage').value = pimcore.settings.websiteLanguages[0];
+
         // Load the requested language on the change event of our selectbox
         var me = this;
         var documentLanguageElement = Ext.get('documentLanguage');
         documentLanguageElement.on('change', function () {
             me.loadLanguage();
-            documentLanguageElement.dom.setAttribute("class", "");
-            documentLanguageElement.addCls("pimcore_icon_language_" + me.getSelectedLanguage().toLowerCase());
         });
 
         // Make sure the accordion doesn't collapse on click
-        documentLanguageElement.on('click', function () {
-            el.collapse();
+        documentLanguageElement.on('click', function (e) {
+            e.stopEvent();
         });
 
         documentLanguageElement.dom.setAttribute("class", "");
         documentLanguageElement.addCls("pimcore_icon_language_" + this.getSelectedLanguage().toLowerCase());
     },
 
-    loadLanguage: function () {
+    loadLanguage: function (callback) {
+        pimcore.globalmanager.get("layout_document_tree").tree.getStore().proxy.setExtraParam('language', this.getSelectedLanguage());
+
+        var self = this;
+        var tree = pimcore.globalmanager.get("layout_document_tree").tree;
+        var rootNode = tree.getRootNode();
+        var ownerTree = rootNode.getOwnerTree();
+
         document.getElementById('documentLanguage').disabled = true;
-        pimcore.globalmanager.get("layout_document_tree").tree.getLoader().baseParams.language = this.getSelectedLanguage();
-        pimcore.globalmanager.get("layout_document_tree").tree.getLoader().load(pimcore.globalmanager.get("layout_document_tree").tree.root, function () {
-            document.getElementById('documentLanguage').disabled = false;
-            pimcore.globalmanager.get("layout_document_tree").tree.root.expand();
+        var documentLanguageElement = Ext.get('documentLanguage');
+        ownerTree.getStore().load({
+            node: rootNode,
+            callback: function() {
+                // update the language flag
+                document.getElementById('documentLanguage').disabled = false;
+                documentLanguageElement.setCls("pimcore_icon_language_" + self.getSelectedLanguage().toLowerCase());
+
+                if (callback) {
+                    callback();
+                }
+            }
         });
     },
 
     loadLanguageInitial: function () {
-        document.getElementById('documentLanguage').disabled = true;
-        pimcore.globalmanager.get("layout_document_tree").tree.getLoader().baseParams.language = this.getSelectedLanguage();
-        pimcore.globalmanager.get("layout_document_tree").tree.getLoader().load(pimcore.globalmanager.get("layout_document_tree").tree.root, function () {
-            document.getElementById('documentLanguage').disabled = false;
-            pimcore.globalmanager.get("layout_document_tree").tree.getLoader().load(pimcore.globalmanager.get("layout_document_tree").tree.root);
-            pimcore.globalmanager.get("layout_document_tree").tree.root.expand();
-        });
+        var self = this;
+        setTimeout(function() {
+            pimcore.globalmanager.get("layout_document_tree").tree.getStore().proxy.setExtraParam('language', pimcore.available_languages[0]);
+            self.loadLanguage();
+        }, 1);
+
+
     },
 
     getSelectedLanguage: function () {
         return Ext.get('documentLanguage').getValue();
-    }
+    },
+
 
 });
 
