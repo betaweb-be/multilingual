@@ -13,7 +13,7 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
         this.setHeader();
 
         // Set the document retrieval url to the plugin
-        pimcore.globalmanager.get("layout_document_tree").tree.loader.dataUrl = '/plugin/Multilingual/index/tree-get-childs-by-id/';
+        pimcore.globalmanager.get("layout_document_tree").treeDataUrl = '/plugin/Multilingual/index/tree-get-childs-by-id/';
 
         // Load initial language selection
         this.loadLanguageInitial();
