@@ -51,7 +51,7 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
         documentLanguageElement.on('change', function () {
             me.loadLanguage();
             documentLanguageElement.dom.setAttribute("class", "");
-            documentLanguageElement.addClass("pimcore_icon_language_" + me.getSelectedLanguage().toLowerCase());
+            documentLanguageElement.addCls("pimcore_icon_language_" + me.getSelectedLanguage().toLowerCase());
         });
 
         // Make sure the accordion doesn't collapse on click
@@ -60,7 +60,7 @@ pimcore.plugin.Multilingual = Class.create(pimcore.plugin.admin, {
         });
 
         documentLanguageElement.dom.setAttribute("class", "");
-        documentLanguageElement.addClass("pimcore_icon_language_" + this.getSelectedLanguage().toLowerCase());
+        documentLanguageElement.addCls("pimcore_icon_language_" + this.getSelectedLanguage().toLowerCase());
     },
 
     loadLanguage: function () {
